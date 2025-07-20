@@ -50,9 +50,17 @@ async def text_to_speech(request: TextToSpeechRequest):
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.mp3"
         filepath = os.path.join(AUDIO_DIR, filename)
         
-        # Convert text to speech
-        speech = gTTS(text=request.text, lang=request.language)
+        # Convert text to speech with better error handling
+        print(f"Converting text to speech: '{request.text}' in language: {request.language}")
+        speech = gTTS(text=request.text, lang=request.language, slow=False)
         speech.save(filepath)
+        
+        # Verify file was created
+        if not os.path.exists(filepath):
+            raise Exception("Audio file was not created successfully")
+            
+        file_size = os.path.getsize(filepath)
+        print(f"Audio file created: {filepath} ({file_size} bytes)")
         
         # Return the file path and download URL
         return {
@@ -60,10 +68,12 @@ async def text_to_speech(request: TextToSpeechRequest):
             "filepath": filepath,
             "filename": filename,
             "download_url": f"/download/{filename}",
-            "message": "Audio file created successfully"
+            "message": f"Audio file created successfully ({file_size} bytes)"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating speech: {str(e)}")
+        error_msg = f"Error generating speech: {str(e)}"
+        print(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @app.get("/download/{filename}")
 async def download_file(filename: str):

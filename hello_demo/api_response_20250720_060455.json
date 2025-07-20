@@ -1,0 +1,9 @@
+{
+  "status": "success",
+  "filepath": "audio_files/hello_20250720_060000_20250720.mp3",
+  "filename": "hello_20250720_060000_20250720.mp3",
+  "download_url": "/download/hello_20250720_060000_20250720.mp3",
+  "message": "Audio file created successfully (2340 bytes)",
+  "input_text": "hello how are you",
+  "language": "en"
+}
